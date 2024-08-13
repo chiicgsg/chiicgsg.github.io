@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポイント加算システム</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-image: url(https://aomaterial.com/wp-content/uploads/2022/11/%E3%83%8F%E3%83%BC%E3%83%88%E3%81%8C%E6%B5%AE%E3%81%8B%E3%81%B6%E3%81%8B%E3%82%8F%E3%81%84%E3%81%84%E7%A9%BA2-1024x576.png); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-family: 'Pacifico', cursive;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        button {
+            background-color: #a7ffeb;
+            color: #004d66;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        button:hover {
+            background-color: #64ffda;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        #inputReason {
+            border: 2px solid #a7ffeb;
+            border-radius: 10px;
+            padding: 10px;
+            width: calc(100% - 24px);
+            max-width: 300px;
+            margin: 10px auto;
+            display: block;
+            font-size: 16px;
+            background-color: #e0f7fa; 
+            color: #004d66; 
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+       
+        #inputPoints {
+            border: 2px solid #a7ffeb;
+            border-radius: 10px;
+            padding: 10px;
+            width: calc(100% - 24px);
+            max-width: 300px;
+            margin: 10px auto;
+            display: block;
+            font-size: 16px;
+            background-color: #e0f7fa;
+            color: #004d66; 
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        ul { 
+            list-style-type: none; 
+            padding: 0; 
+        }
+        li { 
+            margin-bottom: 10px; 
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>ポイント加算システム</h1>
+    <p>現在のポイント: <span id="points">0</span></p>
+    
+    <label for="inputReason">名目:</label>
+    <input type="text" id="inputReason" placeholder="理由">
+    
+    <label for="inputPoints">ポイント:</label>
+    <input type="number" id="inputPoints" placeholder="数値を入力">
+    
+    <button id="addPointBtn">ポイントを加算</button>
+    <button id="resetBtn">リセット</button>
+
+    <h2>履歴</h2>
+    <ul id="historyList"></ul>
+
+    <script>
+        let points = parseInt(localStorage.getItem('points')) || 0;
+        let history = JSON.parse(localStorage.getItem('history')) || [];
+
+        document.getElementById('points').textContent = points;
+        const historyList = document.getElementById('historyList');
+        history.forEach(entry => {
+            const li = document.createElement('li');
+            li.textContent = `${entry.reason} - ${entry.points}ポイント`;
+            historyList.appendChild(li);
+        });
+
+        document.getElementById('addPointBtn').addEventListener('click', function() {
+            let reason = document.getElementById('inputReason').value;
+            let input = document.getElementById('inputPoints').value;
+            let inputPoints = parseInt(input);
+
+            if (reason && !isNaN(inputPoints)) {
+                points += inputPoints;
+                document.getElementById('points').textContent = points;
+
+                const entry = { reason: reason, points: inputPoints };
+                history.push(entry);
+
+                const li = document.createElement('li');
+                li.textContent = `${entry.reason} - ${entry.points}ポイント`;
+                historyList.appendChild(li);
+
+                localStorage.setItem('points', points);
+                localStorage.setItem('history', JSON.stringify(history));
+
+                document.getElementById('inputReason').value = '';
+                document.getElementById('inputPoints').value = '';
+            } else {
+                alert("名目と有効な数値を入力してください");
+            }
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            points = 0;
+            history = [];
+
+            localStorage.removeItem('points');
+            localStorage.removeItem('history');
+
+            document.getElementById('points').textContent = points;
+            historyList.innerHTML = ''; 
+        });
+    </script>
+</body>
+</html>
